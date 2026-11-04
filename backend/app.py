@@ -1,5 +1,6 @@
 
 from flask import Flask, jsonify
+from backend.models import practicas
 
 app = Flask(__name__)
 
@@ -12,6 +13,12 @@ def verificar_salud():
         "estado": "operativo",
         "version": "0.1.0"
     })
+
+
+@app.get("/api/practicas")
+def consultar_practicas():
+    """Devuelve las prácticas de aprendizaje registradas."""
+    return jsonify(practicas), 200
 
 
 if __name__ == "__main__":
