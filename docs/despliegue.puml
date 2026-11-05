@@ -1,0 +1,33 @@
+@startuml
+title LabTrack - Diagrama de despliegue UML
+
+top to bottom direction
+
+skinparam shadowing false
+skinparam linetype ortho
+skinparam defaultFontSize 13
+skinparam nodesep 45
+skinparam ranksep 50
+
+node "Equipo de desarrollo\nWindows 11" as Equipo {
+
+    node "Navegador web" <<device>> as Navegador {
+        artifact "Interfaz LabTrack\nHTML / CSS / JavaScript" as Frontend
+    }
+
+    node "Python 3.13\nServidor Flask" <<executionEnvironment>> as Python {
+        artifact "backend/app.py\nAPI REST" as API
+        artifact "backend/models.py\nLista de prácticas en memoria" as Datos
+    }
+}
+
+Navegador --> Python : HTTP\n127.0.0.1:5000
+
+API --> Datos : Consulta y actualización
+
+note bottom of Equipo
+  Despliegue local de desarrollo.
+  Los datos se pierden al reiniciar Flask.
+end note
+
+@enduml
