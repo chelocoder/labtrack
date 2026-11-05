@@ -1,4 +1,4 @@
-# SENATI LabTrack
+# LabTrack
 
 Aplicación web para registrar y realizar el seguimiento
 de prácticas de aprendizaje en formación técnica.

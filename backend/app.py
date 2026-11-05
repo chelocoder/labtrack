@@ -13,7 +13,7 @@ app = Flask(
 def verificar_salud():
     """Comprueba que el servicio está disponible."""
     return jsonify({
-        "aplicacion": "SENATI LabTrack",
+        "aplicacion": "LabTrack",
         "estado": "operativo",
         "version": "0.1.0"
     })
