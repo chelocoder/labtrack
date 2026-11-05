@@ -50,5 +50,24 @@ def registrar_practica():
 
     return jsonify(nueva_practica), 201
 
+@app.patch("/api/practicas/<int:practica_id>")
+def completar_practica(practica_id):
+    """Marca una práctica de aprendizaje como completada."""
+
+    practica = next(
+        (p for p in practicas if p["id"] == practica_id),
+        None
+    )
+
+    if practica is None:
+        return jsonify({
+            "error": "La práctica solicitada no existe"
+        }), 404
+
+    practica["completada"] = True
+
+    return jsonify(practica), 200
+
+
 if __name__ == "__main__":
     app.run(debug=True)
