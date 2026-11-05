@@ -1,4 +1,4 @@
-# SENATI LabTrack
+# LabTrack
 
 Aplicación web para registrar y realizar el seguimiento
 de prácticas de aprendizaje en formación técnica.
@@ -7,9 +7,9 @@ de prácticas de aprendizaje en formación técnica.
 
 Proyecto académico del curso Ingeniería de Software II.
 
-Caso de aplicación: SENATI, CFP La Oroya.
+Caso de aplicación: seguimiento de prácticas en un centro de formación técnica.
 
-## Funcionalidades previstas
+## Funcionalidades implementadas
 
 1. Registrar prácticas de aprendizaje.
 2. Consultar las prácticas registradas.

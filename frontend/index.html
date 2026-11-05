@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es-PE">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LabTrack</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <script src="/js/app.js" defer></script>
+</head>
+<body>
+    <header>
+        <h1>LabTrack</h1>
+        <p>Seguimiento de prácticas de aprendizaje</p>
+        <small>Proyecto académico — CFP La Oroya</small>
+    </header>
+
+    <main>
+        <section>
+            <h2>Registrar práctica</h2>
+
+            <form id="form-practica">
+                <label for="titulo">Título de la práctica</label>
+                <input type="text" id="titulo" name="titulo"
+                    placeholder="Ej. Crear una API REST" required>
+
+                <label for="curso">Curso</label>
+                <input type="text" id="curso" name="curso"
+                    placeholder="Ej. Desarrollo Backend" required>
+
+                <button type="submit">Registrar práctica</button>
+            </form>
+
+            <p id="mensaje" role="status" aria-live="polite"></p>
+        </section>
+
+        <section>
+            <h2>Prácticas registradas</h2>
+            <div id="lista-practicas">
+                Cargando prácticas...
+            </div>
+        </section>
+    </main>
+</body>
+</html>
