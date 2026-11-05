@@ -2,7 +2,11 @@
 from flask import Flask, jsonify, request
 from backend.models import practicas
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    static_folder="../frontend",
+    static_url_path=""
+)
 
 
 @app.get("/api/salud")
@@ -14,6 +18,10 @@ def verificar_salud():
         "version": "0.1.0"
     })
 
+@app.get("/")
+def pagina_principal():
+    """Muestra la interfaz web de SENATI LabTrack."""
+    return app.send_static_file("index.html")
 
 @app.get("/api/practicas")
 def consultar_practicas():
