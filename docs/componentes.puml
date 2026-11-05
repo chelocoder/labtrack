@@ -1,0 +1,41 @@
+@startuml
+title LabTrack - Diagrama de componentes UML
+
+top to bottom direction
+
+skinparam shadowing false
+skinparam componentStyle uml2
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam defaultFontSize 13
+skinparam nodesep 45
+skinparam ranksep 55
+
+actor "Instructor" as Usuario
+
+package "Frontend" {
+    component "Interfaz web\nHTML / CSS" as Vista
+    component "Lógica de interfaz\nJavaScript (fetch)" as JS
+
+    Vista -right-> JS
+}
+
+package "Backend - Python / Flask" {
+    component "API REST\nbackend/app.py" as API
+    component "Modelo de datos\nbackend/models.py" as Modelo
+
+    API -right-> Modelo
+}
+
+component "Lista de prácticas\nen memoria" as Memoria
+
+Usuario -down-> Vista
+JS -down-> API : HTTP / JSON
+Modelo -down-> Memoria
+
+note right of Memoria
+  Los datos se pierden
+  al reiniciar Flask.
+end note
+
+@enduml
