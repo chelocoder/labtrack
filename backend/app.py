@@ -28,8 +28,21 @@ def pagina_principal():
 
 @app.get("/api/practicas")
 def consultar_practicas():
-    """Devuelve las prácticas de aprendizaje registradas."""
-    return jsonify(practicas), 200
+    """Devuelve la lista de prácticas o sus cantidades por estado."""
+    return responder_consulta(practicas)
+
+
+def responder_consulta(registros):
+    valores = request.args.getlist("resumen")
+    if len(valores) > 1 or (valores and valores[0] not in ("true", "false")):
+        return jsonify({"error": "El parámetro resumen debe ser true o false"}), 400
+
+    if valores != ["true"]:
+        return jsonify(registros), 200
+
+    completadas = sum(practica["completada"] for practica in registros)
+    total = len(registros)
+    return jsonify(total=total, pendientes=total - completadas, completadas=completadas), 200
 
 @app.post("/api/practicas")
 def registrar_practica():
