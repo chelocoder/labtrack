@@ -85,7 +85,7 @@ Ejecutar:
 python -m pytest -v
 ```
 
-La batería actual comprende seis pruebas automatizadas.
+La batería actual comprende 47 pruebas automatizadas.
 
 ## Control de versiones
 
@@ -97,10 +97,16 @@ La integración se realiza mediante pull requests.
 
 ## Integración continua
 
-El archivo `.github/workflows/ci.yml` define un
-pipeline de GitHub Actions que instala las dependencias
-y ejecuta pytest cuando se realizan cambios o se proponen
-pull requests hacia `develop` y `main`.
+GitHub Actions ejecuta el check **Pruebas automatizadas** en pushes y pull requests para develop y main. Se usa Python 3.13 y las dependencias fijadas en requirements-dev.txt.
+
+Para reproducir el control local:
+
+```bash
+python -m pip install -r requirements-dev.txt
+python -m pytest -v --cov --cov-report=term-missing --cov-report=xml:coverage.xml
+```
+
+El umbral de 95 % se aplica al porcentaje combinado de sentencias y ramas de backend. El XML se descarga desde el artefacto cobertura-backend de la ejecución. Para conservar los resultados fuera de la raíz, se puede indicar otra ruta para el XML y definir COVERAGE_FILE.
 
 ## Documentación técnica
 

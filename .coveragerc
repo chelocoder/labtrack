@@ -1,0 +1,9 @@
+[run]
+branch = True
+source = backend
+relative_files = True
+
+[report]
+fail_under = 95
+precision = 2
+show_missing = True

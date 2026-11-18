@@ -187,3 +187,25 @@ def test_primer_registro_en_lista_vacia_recibe_id_uno(cliente):
     assert respuesta.status_code == 201
     assert respuesta.get_json()["id"] == 1
     assert cliente.get("/api/practicas").get_json() == [respuesta.get_json()]
+
+def test_portada_entrega_el_formulario_y_los_recursos(cliente):
+    respuesta = cliente.get("/")
+
+    assert respuesta.status_code == 200
+    assert respuesta.mimetype == "text/html"
+    assert b'id="form-practica"' in respuesta.data
+    assert b'/js/app.js' in respuesta.data
+    assert b'/css/styles.css' in respuesta.data
+    assert cliente.get("/js/app.js").status_code == 200
+    assert cliente.get("/css/styles.css").status_code == 200
+
+
+def test_resumen_de_coleccion_vacia_conserva_contrato(cliente):
+    practicas.clear()
+
+    resumen = cliente.get("/api/practicas?resumen=true")
+    listado = cliente.get("/api/practicas")
+
+    assert resumen.status_code == listado.status_code == 200
+    assert resumen.get_json() == {"total": 0, "pendientes": 0, "completadas": 0}
+    assert listado.get_json() == []
