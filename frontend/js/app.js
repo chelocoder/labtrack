@@ -10,12 +10,31 @@ function mostrarMensaje(texto, esError = false) {
     mensaje.style.color = esError ? "#b91c1c" : "#166534";
 }
 
+async function mensajeDeError(respuesta, estadoEsperado, alternativo) {
+    const tipo = respuesta.headers.get("Content-Type")?.split(";")[0].trim().toLowerCase();
+    if (respuesta.status !== estadoEsperado || tipo !== "application/json") {
+        return alternativo;
+    }
+
+    try {
+        const datos = await respuesta.json();
+        if (typeof datos?.error === "string" && datos.error.trim()) {
+            return datos.error.trim();
+        }
+    } catch {
+        return alternativo;
+    }
+
+    return alternativo;
+}
+
 async function cargarPracticas() {
+    const errorConsulta = "No se pudieron consultar las prácticas";
     try {
         const respuesta = await fetch(API_URL);
 
         if (!respuesta.ok) {
-            throw new Error("No se pudieron consultar las prácticas");
+            throw new Error(errorConsulta);
         }
 
         const practicas = await respuesta.json();
@@ -60,32 +79,35 @@ async function cargarPracticas() {
             lista.appendChild(tarjeta);
         });
 
-    } catch (error) {
+    } catch {
         lista.textContent = "Error al cargar las prácticas.";
-        mostrarMensaje(error.message, true);
+        mostrarMensaje(errorConsulta, true);
     }
 }
 
 async function completarPractica(id) {
+    const errorFinalizacion = "No se pudo completar la práctica";
     try {
         const respuesta = await fetch(`${API_URL}/${id}`, {
             method: "PATCH"
         });
 
         if (!respuesta.ok) {
-            throw new Error("No se pudo completar la práctica");
+            mostrarMensaje(await mensajeDeError(respuesta, 404, errorFinalizacion), true);
+            return;
         }
 
         mostrarMensaje("Práctica completada correctamente.");
         await cargarPracticas();
 
-    } catch (error) {
-        mostrarMensaje(error.message, true);
+    } catch {
+        mostrarMensaje(errorFinalizacion, true);
     }
 }
 
 formulario.addEventListener("submit", async (evento) => {
     evento.preventDefault();
+    const errorRegistro = "No se pudo registrar la práctica";
 
     const datos = {
         titulo: document.getElementById("titulo").value.trim(),
@@ -102,15 +124,16 @@ formulario.addEventListener("submit", async (evento) => {
         });
 
         if (!respuesta.ok) {
-            throw new Error("No se pudo registrar la práctica");
+            mostrarMensaje(await mensajeDeError(respuesta, 400, errorRegistro), true);
+            return;
         }
 
         formulario.reset();
         mostrarMensaje("Práctica registrada correctamente.");
         await cargarPracticas();
 
-    } catch (error) {
-        mostrarMensaje(error.message, true);
+    } catch {
+        mostrarMensaje(errorRegistro, true);
     }
 });
 
