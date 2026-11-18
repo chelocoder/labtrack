@@ -2,6 +2,9 @@
 from flask import Flask, jsonify, request
 from backend.models import practicas
 
+MAX_TITULO = 120
+MAX_CURSO = 80
+
 app = Flask(
     __name__,
     static_folder="../frontend",
@@ -45,12 +48,21 @@ def registrar_practica():
     if not isinstance(curso, str) or not curso.strip():
         return jsonify({"error": "El curso es obligatorio"}), 400
 
+    titulo = titulo.strip()
+    curso = curso.strip()
+
+    if len(titulo) > MAX_TITULO:
+        return jsonify({"error": f"El título admite como máximo {MAX_TITULO} caracteres"}), 400
+
+    if len(curso) > MAX_CURSO:
+        return jsonify({"error": f"El curso admite como máximo {MAX_CURSO} caracteres"}), 400
+
     nuevo_id = max((p["id"] for p in practicas), default=0) + 1
 
     nueva_practica = {
         "id": nuevo_id,
-        "titulo": titulo.strip(),
-        "curso": curso.strip(),
+        "titulo": titulo,
+        "curso": curso,
         "completada": False
     }
 
