@@ -28,8 +28,28 @@ def pagina_principal():
 
 @app.get("/api/practicas")
 def consultar_practicas():
-    """Devuelve la lista de prácticas o sus cantidades por estado."""
-    return responder_consulta(practicas)
+    """Devuelve las prácticas filtradas o sus cantidades por estado."""
+    if any(len(request.args.getlist(campo)) > 1 for campo in ("curso", "estado")):
+        return jsonify({"error": "Los filtros curso y estado no admiten valores repetidos"}), 400
+
+    curso = request.args.get("curso")
+    estado = request.args.get("estado")
+    if curso is not None:
+        curso = curso.strip().casefold()
+        if not curso:
+            return jsonify({"error": "El filtro curso no puede estar vacío"}), 400
+
+    if estado is not None:
+        estado = estado.strip().casefold()
+        if estado not in ("pendiente", "completada"):
+            return jsonify({"error": "El estado debe ser pendiente o completada"}), 400
+
+    resultado = [
+        practica for practica in practicas
+        if (curso is None or practica["curso"].casefold() == curso)
+        and (estado is None or practica["completada"] == (estado == "completada"))
+    ]
+    return responder_consulta(resultado)
 
 
 def responder_consulta(registros):
