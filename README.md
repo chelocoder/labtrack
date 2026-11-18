@@ -14,6 +14,8 @@ Caso de aplicación: seguimiento de prácticas en un centro de formación técni
 1. Registrar prácticas de aprendizaje.
 2. Consultar las prácticas registradas.
 3. Marcar prácticas como completadas.
+4. Filtrar prácticas por curso o estado.
+5. Consultar un resumen de la lista o de la selección.
 
 ## Tecnologías
 
@@ -25,7 +27,7 @@ Caso de aplicación: seguimiento de prácticas en un centro de formación técni
 
 ## Estado
 
-Proyecto en fase de revisión.
+Aplicación académica para ejecución local y validación mediante GitHub Actions.
 
 
 ## Instalación
@@ -67,7 +69,7 @@ python -m pip install -r requirements.txt
 Iniciar el servidor Flask:
 
 ```bash
-python -m backend.app
+python -m flask --app backend.app run --host 127.0.0.1 --port 5000
 ```
 
 Abrir en el navegador:
@@ -77,9 +79,21 @@ http://127.0.0.1:5000
 La aplicación permite registrar, consultar y completar
 prácticas de aprendizaje desde la interfaz web.
 
+## API desde Git Bash
+
+```bash
+curl -fsS 'http://127.0.0.1:5000/api/practicas'
+curl -fsS 'http://127.0.0.1:5000/api/practicas?curso=Base%20de%20Datos&estado=pendiente'
+curl -fsS 'http://127.0.0.1:5000/api/practicas?estado=pendiente&resumen=true'
+curl -fsS -H 'Content-Type: application/json' -d '{"titulo":"Montar una API","curso":"Backend"}' 'http://127.0.0.1:5000/api/practicas'
+curl -fsS -X PATCH 'http://127.0.0.1:5000/api/practicas/1'
+```
+
+El registro admite hasta 120 caracteres en el título y 80 en el curso tras recortar espacios. Las entradas inválidas producen HTTP 400. Completar una práctica inexistente produce HTTP 404. El resumen cuenta los resultados de la selección, con o sin filtros.
+
 ## Pruebas automatizadas
 
-Ejecutar:
+Instalar las dependencias de desarrollo con python -m pip install -r requirements-dev.txt y ejecutar:
 
 ```bash
 python -m pytest -v
@@ -89,15 +103,16 @@ La batería actual comprende 47 pruebas automatizadas.
 
 ## Control de versiones
 
-- `main`: rama principal.
+- `main`: versión estable liberada.
 - `develop`: integración de funcionalidades.
+- `qa`: rama de validación, sin servidor de staging.
 - `feature/*`: desarrollo de cambios independientes.
 
-La integración se realiza mediante pull requests.
+La promoción sigue develop → qa → main. La primera creación de qa parte de un develop verificado. Las siguientes promociones con diferencias se revisan mediante pull request.
 
 ## Integración continua
 
-GitHub Actions ejecuta el check **Pruebas automatizadas** en pushes y pull requests para develop y main. Se usa Python 3.13 y las dependencias fijadas en requirements-dev.txt.
+GitHub Actions ejecuta el check **Pruebas automatizadas** en pushes y pull requests para develop, qa y main. El check es obligatorio en develop y main. Se usa Python 3.13 y las dependencias fijadas en requirements-dev.txt.
 
 Para reproducir el control local:
 
@@ -122,4 +137,3 @@ cuando el servidor Flask se reinicia.
 
 La versión actual está destinada a demostración y
 evaluación académica. No se ha desplegado en producción.
-```
