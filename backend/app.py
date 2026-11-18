@@ -2,6 +2,9 @@
 from flask import Flask, jsonify, request
 from backend.models import practicas
 
+MAX_TITULO = 120
+MAX_CURSO = 80
+
 app = Flask(
     __name__,
     static_folder="../frontend",
@@ -25,8 +28,41 @@ def pagina_principal():
 
 @app.get("/api/practicas")
 def consultar_practicas():
-    """Devuelve las prácticas de aprendizaje registradas."""
-    return jsonify(practicas), 200
+    """Devuelve las prácticas filtradas o sus cantidades por estado."""
+    if any(len(request.args.getlist(campo)) > 1 for campo in ("curso", "estado")):
+        return jsonify({"error": "Los filtros curso y estado no admiten valores repetidos"}), 400
+
+    curso = request.args.get("curso")
+    estado = request.args.get("estado")
+    if curso is not None:
+        curso = curso.strip().casefold()
+        if not curso:
+            return jsonify({"error": "El filtro curso no puede estar vacío"}), 400
+
+    if estado is not None:
+        estado = estado.strip().casefold()
+        if estado not in ("pendiente", "completada"):
+            return jsonify({"error": "El estado debe ser pendiente o completada"}), 400
+
+    resultado = [
+        practica for practica in practicas
+        if (curso is None or practica["curso"].casefold() == curso)
+        and (estado is None or practica["completada"] == (estado == "completada"))
+    ]
+    return responder_consulta(resultado)
+
+
+def responder_consulta(registros):
+    valores = request.args.getlist("resumen")
+    if len(valores) > 1 or (valores and valores[0] not in ("true", "false")):
+        return jsonify({"error": "El parámetro resumen debe ser true o false"}), 400
+
+    if valores != ["true"]:
+        return jsonify(registros), 200
+
+    completadas = sum(practica["completada"] for practica in registros)
+    total = len(registros)
+    return jsonify(total=total, pendientes=total - completadas, completadas=completadas), 200
 
 @app.post("/api/practicas")
 def registrar_practica():
@@ -45,12 +81,21 @@ def registrar_practica():
     if not isinstance(curso, str) or not curso.strip():
         return jsonify({"error": "El curso es obligatorio"}), 400
 
+    titulo = titulo.strip()
+    curso = curso.strip()
+
+    if len(titulo) > MAX_TITULO:
+        return jsonify({"error": f"El título admite como máximo {MAX_TITULO} caracteres"}), 400
+
+    if len(curso) > MAX_CURSO:
+        return jsonify({"error": f"El curso admite como máximo {MAX_CURSO} caracteres"}), 400
+
     nuevo_id = max((p["id"] for p in practicas), default=0) + 1
 
     nueva_practica = {
         "id": nuevo_id,
-        "titulo": titulo.strip(),
-        "curso": curso.strip(),
+        "titulo": titulo,
+        "curso": curso,
         "completada": False
     }
 
