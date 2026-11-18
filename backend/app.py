@@ -28,7 +28,7 @@ def pagina_principal():
 
 @app.get("/api/practicas")
 def consultar_practicas():
-    """Devuelve las prácticas que coinciden con los filtros de consulta."""
+    """Devuelve las prácticas filtradas o sus cantidades por estado."""
     if any(len(request.args.getlist(campo)) > 1 for campo in ("curso", "estado")):
         return jsonify({"error": "Los filtros curso y estado no admiten valores repetidos"}), 400
 
@@ -49,7 +49,20 @@ def consultar_practicas():
         if (curso is None or practica["curso"].casefold() == curso)
         and (estado is None or practica["completada"] == (estado == "completada"))
     ]
-    return jsonify(resultado), 200
+    return responder_consulta(resultado)
+
+
+def responder_consulta(registros):
+    valores = request.args.getlist("resumen")
+    if len(valores) > 1 or (valores and valores[0] not in ("true", "false")):
+        return jsonify({"error": "El parámetro resumen debe ser true o false"}), 400
+
+    if valores != ["true"]:
+        return jsonify(registros), 200
+
+    completadas = sum(practica["completada"] for practica in registros)
+    total = len(registros)
+    return jsonify(total=total, pendientes=total - completadas, completadas=completadas), 200
 
 @app.post("/api/practicas")
 def registrar_practica():
